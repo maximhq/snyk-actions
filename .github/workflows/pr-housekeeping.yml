@@ -5,13 +5,24 @@ on:
     - cron: '0 0 * * *' # Every day at midnight
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   close-stale:
+    permissions:
+      issues: write  # for actions/stale to close stale issues
+      pull-requests: write  # for actions/stale to close stale PRs
     runs-on: ubuntu-latest
     name: 'Label and close stale PRs after no activity for a long time'
     steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@ab7a9404c0f3da075243ca237b5fac12c98deaa5 # v2.19.3
+        with:
+          egress-policy: audit
+
       - name: 'Close stale PRs'
-        uses: actions/stale@v9.1.0
+        uses: actions/stale@5bef64f19d7facfb25b37b414482c7164d639639 # v9.1.0
         with:
           stale-pr-label: Stale
           days-before-stale: 30
